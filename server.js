@@ -33,9 +33,20 @@ app.get('/api/timestamp/:date_string?', function (req, res) {
   var date_string = req.params.date_string;
   date_string = isNaN(date_string) ? date_string : parseInt(date_string);
 
+  var dateFormatValidate = /^[0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2}/;
+
   var date = date_string != null ? new Date(date_string) : new Date();
 
-  res.send({ unix: date.getTime(), utc: date.toUTCString() });
+  var date =
+    date_string != null
+      ? dateFormatValidate.test(date_string)
+        ? new Date(date_string)
+        : null
+      : new Date();
+
+  date != null
+    ? res.send({ unix: date.getTime(), utc: date.toUTCString() })
+    : res.send({ error: 'Invalid Date' });
 });
 
 // listen for requests :)
