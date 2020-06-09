@@ -12,7 +12,7 @@ var cors = require('cors');
 app.use(cors({ optionSuccessStatus: 200 })); // some legacy browsers choke on 204
 
 app.use('/', function (req, res, next) {
-  console.log(`${req.method} ${req.path} - ${req.ip}`);
+  console.log(`${req.method} ${req.path}`);
   next();
 });
 
@@ -35,14 +35,18 @@ app.get('/api/timestamp/:date_string?', function (req, res) {
 
   var dateFormatValidate = /^[0-9]{4}\-[0-9]{1,2}\-[0-9]{1,2}/;
 
-  var date = date_string != null ? new Date(date_string) : new Date();
-
+  //var date = date_string != null ? new Date(date_string) : new Date();
+  // console.log(date_string != undefined);
   var date =
     date_string != null
-      ? dateFormatValidate.test(date_string)
+      ? dateFormatValidate.test(date_string) || typeof date_string === 'number'
         ? new Date(date_string)
         : null
       : new Date();
+
+  date != null
+    ? console.log({ unix: date.getTime(), utc: date.toUTCString() })
+    : console.log({ error: 'Invalid Date' });
 
   date != null
     ? res.send({ unix: date.getTime(), utc: date.toUTCString() })
