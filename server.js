@@ -12,7 +12,8 @@ var cors = require('cors');
 app.use(cors({ optionSuccessStatus: 200 })); // some legacy browsers choke on 204
 
 app.use('/', function (req, res, next) {
-  console.log(`${req.method} ${req.path}`);
+  //console.log(`${req.method} ${req.path} - ${req.ip}`);
+  console.log(req.headers);
   next();
 });
 
@@ -51,6 +52,15 @@ app.get('/api/timestamp/:date_string?', function (req, res) {
   date != null
     ? res.send({ unix: date.getTime(), utc: date.toUTCString() })
     : res.send({ error: 'Invalid Date' });
+});
+
+app.get('/api/whoami', function (req, res, next) {
+  var headers = req.headers;
+  res.send({
+    ipaddress: headers['x-forwarded-for'].split(',')[0],
+    language: headers['accept-language'],
+    software: headers['user-agent'],
+  });
 });
 
 // listen for requests :)
